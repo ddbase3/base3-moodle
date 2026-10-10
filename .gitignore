@@ -1,0 +1,9 @@
+# Personal editor and OS files only.
+.DS_Store
+*~
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Independent BASE3 module repositories are excluded by modules/.gitignore.
