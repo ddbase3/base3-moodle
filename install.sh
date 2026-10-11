@@ -55,4 +55,4 @@ for module_dir in "$BASE3_DIR"/modules/*; do
     echo "Copied assets: $module_name"
 done
 
-echo 'BASE3 Moodle files installed. Run Moodle upgrade and cache purge as documented.'
+echo 'BASE3 Moodle files and module assets installed. Moodle handles native plugin upgrades when required.'

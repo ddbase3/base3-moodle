@@ -18,10 +18,22 @@ From the Moodle root, run `./base3/install.sh`. This synchronizes only
 using `rsync --delete`. Old plugin files are removed. It publishes module
 assets as regular files, not symbolic links. No BASE3 module is changed.
 
-After an initial install or a native Moodle plugin version change, run Moodle's
-`admin/cli/upgrade.php --non-interactive` in the PHP runtime. After installing
-or updating, run `admin/cli/purge_caches.php`.
+The installer only deploys files. It does not invoke Moodle CLI, Docker, or
+BASE3 bootstrap commands. Moodle itself handles installation and upgrades of
+native Moodle plugins. On first installation or after changing a native Moodle
+plugin version, open Moodle's Site administration and complete any pending
+plugin upgrade. Moodle also offers `admin/cli/upgrade.php` for operators who
+prefer its CLI. Neither action is normally needed merely because a BASE3
+module was added or updated.
 
-Changes must be made under `moodle/` and deployed with `./install.sh`, not
-edited in `public/`. Re-run `./install.sh` after updating a BASE3 module whose
-assets changed. Run the installer from the host, not a read-only container.
+BASE3 automatically refreshes its class map on the next bootstrap when the
+installed modules change. A manual `--rebuild` is not normally required.
+Moodle cache purging is not a mandatory step for BASE3 module additions;
+use Moodle's own cache management if changes are not visible when expected.
+
+Changes to the native Moodle plugins belong under `moodle/` and are deployed
+with `./install.sh`, not edited in `public/`. Re-run `./install.sh` whenever
+an installed BASE3 module's public assets change. The installer must run in
+an environment with filesystem write access to the Moodle installation and
+`rsync` available; it does not assume a particular web server or deployment
+system.
