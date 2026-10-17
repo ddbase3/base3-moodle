@@ -15,13 +15,14 @@ $PAGE->set_url(new moodle_url('/local/base3/chatbot.php'));
 $PAGE->set_context(context_system::instance());
 $data = \local_base3\ChatbotBubble::chatbotData();
 $html = \local_base3\Runtime::renderEmbedded('chatbotdisplay', $data);
+$language = \local_base3\Runtime::container()->get(\Base3\Language\Api\ILanguage::class)->getLanguage();
 
 header('Content-Type: text/html; charset=utf-8');
 header('Cache-Control: no-store');
 header('X-Frame-Options: SAMEORIGIN');
 ?>
 <!doctype html>
-<html lang="<?php echo s(current_language()); ?>">
+<html lang="<?php echo s($language); ?>">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
