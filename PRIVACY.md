@@ -84,3 +84,11 @@ provider data transfers, logs, retention, and user-facing notices for their
 actual deployment. The module's keyboard interactions and focus handling
 should be verified with the site's Moodle theme against BASE3's WCAG 2.2 AA
 baseline; source-level checks do not constitute a full accessibility audit.
+
+## Launcher button presentation (18 October 2026)
+
+The global Moodle launcher no longer references the native icon SVG.
+It uses the shared ClientStack default blue labeled button, matching
+WordPress. This change does not affect data processing, storage, access,
+deletion or recipients. The former SVG file remains in the native plugin
+tree but is not requested by the launcher.
