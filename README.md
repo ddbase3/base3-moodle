@@ -65,3 +65,36 @@ valid BCP 47 language tag for ClientStack's message timestamp formatters, which
 otherwise throw a browser `RangeError` before the user message is displayed.
 The generic AJAX dispatch, chat transport and the shared ClientStack script
 are unchanged. Run `./install.sh` after applying changes to the Moodle sources.
+
+## Unified global chatbot launcher (ClientStack)
+
+The global chatbot now uses the same `ClientStack` ES module and CSS as ILIAS
+and WordPress. Pull the current ClientStack module first. The Moodle native
+footer hook renders `base3moodleglobalchatbotlauncheroutput` through the normal
+BASE3 `IOutput`/`Runtime::renderEmbedded` mechanism; content is loaded through
+`local/base3/ajax.php` as `chatbotdisplay`. No Moodle-specific launcher
+JavaScript/CSS or custom chatbot HTTP endpoint remains.
+
+In BASE3 tools > Chatbot, the **Configuration** tab owns the global
+`chatbot/default` instance, **Launcher** owns the shared presentation settings
+(`global-chatbot-launcher/default`), and **Extensions** remains unchanged.
+Moodle's native plugin settings control only launcher enablement and viewer
+visibility. Previously configured native window options are imported once
+when the central BASE3 dataset is absent; the old native group/name selector
+is no longer used. Individual content chatbot displays retain independent
+configuration identities.
+
+After extracting the launcher patch into the BASE3 Moodle source directory:
+
+```sh
+sh ./remove-obsolete-moodle-global-chatbot-launcher.sh
+./install.sh
+php modules/Base3MoodleLab/test/GlobalChatbotLauncherSmokeTest.php
+```
+
+The removal script deletes the old `chatbot.php` iframe document and the two
+Moodle-specific launcher asset files **from the source tree only**. The existing
+installer synchronizes the deletion to Moodle's `public/` directory and
+publishes ClientStack assets. The old chatbot icon SVG is retained.
+
+See `moodle/local/base3/README_CHATBOT.md` and `PRIVACY.md` for details.

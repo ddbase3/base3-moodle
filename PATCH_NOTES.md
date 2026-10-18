@@ -1,28 +1,59 @@
-# BASE3 Moodle: floating chatbot language fix
+# Moodle global chatbot: shared ClientStack launcher
 
-## Cause
+## Change scope
 
-The floating chatbot iframe wrote `current_language()` directly into the HTML `lang` attribute. The Moodle German informal language pack reports `de_du`, which is not a valid BCP 47 language tag. ClientStack's `Chatbot.js` reads this attribute and calls `Intl.DateTimeFormat`, which throws `RangeError: Invalid language tag: de_du`. This happens before the message is appended and before transport starts, leaving the send button in its stop state.
+- Replaces the native Moodle bubble JavaScript/CSS with the already maintained
+  `ClientStack/assets/globalchatbotlauncher` ES module and stylesheet.
+- Leaves `local_base3` enablement and visibility checks native to Moodle.
+- Adds the ClientStack **Launcher** settings tab between **Configuration** and
+  **Extensions** in Base3MoodleLab. The existing `chatbot/default` configuration
+  and 13 generic FileManager endpoints are preserved.
+- Reuses the generic `local/base3/ajax.php` dispatcher and BASE3 display
+  `chatbotdisplay`, with no new AJAX adapter or independent chatbot backend.
+- Imports legacy native Moodle window flags once when no canonical BASE3
+  launcher settings record exists. Fixed global identity: `chatbot/default`.
+- Uses Moodle `#page-wrapper` and fixed-navbar selectors for docked layout.
 
-## Change
+## Important: ClientStack is not included
 
-Only `moodle/local/base3/chatbot.php` runtime behavior changes. The iframe now obtains its HTML language attribute from the existing BASE3 `ILanguage` binding, whose `MoodleLanguage` implementation normalizes `de_du` to `de`.
+Update `modules/ClientStack` from Git before installation. Its
+`assets/globalchatbotlauncher/index.js`, stylesheet and existing assetloader
+must be present. The current WordPress sidebar layering correction is already
+part of that shared CSS.
 
-The generic AJAX dispatcher, FileManager, transport, ClientStack, framework and project module are unchanged. The root README and PRIVACY notes document the rendering change; `test/ChatbotLocaleSmokeTest.php` exercises the actual iframe template with `de_du`.
+## Installation
 
-## Install
-
-From the BASE3 Moodle source checkout:
+From the Moodle BASE3 source root (`.../html/base3`):
 
 ```sh
-unzip -o /path/base3_moodle_chatbot_locale_fix_20261017.zip
+unzip -o /path/base3_moodle_clientstack_global_launcher_20261018.zip
+sh ./remove-obsolete-moodle-global-chatbot-launcher.sh
 ./install.sh
+php modules/Base3MoodleLab/test/GlobalChatbotLauncherSmokeTest.php
 ```
 
-Optional smoke test (installed BASE3 modules are required in `modules/`):
+The removal script deletes only the obsolete source `moodle/local/base3/chatbot.php`,
+`moodle/local/base3/assets/chatbot/bubble.js`, and `bubble.css`.
+`./install.sh` propagates these removals to the public Moodle plugin directory
+through its existing `rsync --delete` flow. The icon SVG is intentionally kept.
+No core files, migrations, new transport or Foundation interfaces are changed.
 
-```sh
-php test/ChatbotLocaleSmokeTest.php
-```
+## Verification and limitations
 
-Open the global chatbot again and send a message. This patch removes the demonstrated synchronous browser exception. It does not, on its own, verify that the subsequent chat backend request succeeds.
+- Isolated PHP launcher smoke test: visibility, identity, canonical settings,
+  legacy import precedence, generic routing, admin tab order and FileManager
+  endpoint count.
+- Existing FileManager smoke test is included in the host sources and can be
+  rerun unchanged.
+- PHP syntax checks and patch application rehearsal.
+- A real browser integration test under the target Moodle theme, including
+  focus management, resize, sidebar docking and navigation reopening, remains
+  necessary after deployment.
+
+## Compatibility
+
+The previous native Moodle window options are removed from the Moodle plugin
+settings screen; their stored values are preserved for the one-time import.
+The former Moodle group/name selectors are no longer used, because the global
+launcher must match the BASE3 Chatbot Configuration tab: `chatbot/default`.
+Content chatbots keep their own independent configuration records.

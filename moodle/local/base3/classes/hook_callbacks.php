@@ -4,7 +4,7 @@ namespace local_base3;
 
 use core\hook\output\before_standard_footer_html_generation;
 
-/** Native Moodle page hook for one optional globally configured BASE3 display. */
+/** Native Moodle page hook for BASE3's global display and chatbot launcher. */
 final class hook_callbacks {
 
 	public static function embed_global_display(before_standard_footer_html_generation $hook): void {
@@ -25,7 +25,8 @@ final class hook_callbacks {
 
 		require_once __DIR__ . '/ChatbotBubble.php';
 		if (ChatbotBubble::visible()) {
-			$html .= ChatbotBubble::renderLauncher();
+			require_once __DIR__ . '/Runtime.php';
+			$html .= Runtime::renderEmbedded('base3moodleglobalchatbotlauncheroutput');
 		}
 		if ($html !== '') $hook->add_html($html);
 	}

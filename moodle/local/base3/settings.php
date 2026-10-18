@@ -25,8 +25,8 @@ if ($hassiteconfig) {
 	}
 	$ADMIN->add('local_base3_category', $global);
 
-	// The floating chatbot is optional and uses the regular Chatbot settings
-	// identity. Its UI configuration belongs to the native Moodle plugin.
+	// Native Moodle settings control visibility only. Launcher presentation is
+	// configured centrally under BASE3 Tools > Chatbot > Launcher.
 	$bubble = new admin_settingpage('local_base3_chatbotbubble', new lang_string('chatbotbubble', 'local_base3'));
 	if ($ADMIN->fulltree) {
 		$bubble->add(new admin_setting_configcheckbox(
@@ -41,28 +41,6 @@ if ($hassiteconfig) {
 				'administrators' => new lang_string('chatbotbubble_administrators', 'local_base3')
 			]
 		));
-		foreach (['group' => 'chatbot', 'name' => 'default'] as $key => $value) {
-			$bubble->add(new admin_setting_configtext(
-				'local_base3/chatbotbubble_' . $key,
-				new lang_string('chatbotbubble_' . $key, 'local_base3'),
-				new lang_string('chatbotbubble_' . $key . 'desc', 'local_base3'),
-				$value, PARAM_ALPHANUMEXT
-			));
-		}
-		foreach (['label', 'title'] as $key) {
-			$bubble->add(new admin_setting_configtext(
-				'local_base3/chatbotbubble_' . $key,
-				new lang_string('chatbotbubble_' . $key, 'local_base3'), '', '', PARAM_TEXT
-			));
-		}
-		foreach (['modal' => '1', 'docked' => '0', 'cover' => '0', 'fullscreen' => '0',
-			'resizeoverlay' => '0', 'resizemodal' => '0', 'resizedocked' => '0',
-			'remembermode' => '0', 'reopenoverlay' => '0', 'reopendocked' => '0'] as $key => $default) {
-			$bubble->add(new admin_setting_configcheckbox(
-				'local_base3/chatbotbubble_' . $key,
-				new lang_string('chatbotbubble_' . $key, 'local_base3'), '', $default
-			));
-		}
 	}
 	$ADMIN->add('local_base3_category', $bubble);
 }
