@@ -28,9 +28,8 @@ final class AdminTools {
 		Runtime::boot();
 		$resolver = Runtime::container()->get(IAssetResolver::class);
 		$root = 'plugin/ClientStack/assets/';
-		$js = $resolver->resolve($root . 'assetloader/assetloader.min.js');
+		Runtime::requireClientStackAssetLoader();
 		$css = $resolver->resolve($root . 'jqueryui/jquery-ui.css');
-		if ($js !== $root . 'assetloader/assetloader.min.js') $PAGE->requires->js(new \moodle_url($js), false);
 		if ($css !== $root . 'jqueryui/jquery-ui.css') $PAGE->requires->css(new \moodle_url($css));
 	}
 }

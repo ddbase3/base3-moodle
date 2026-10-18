@@ -18,12 +18,8 @@ $PAGE->set_pagelayout('standard');
 $PAGE->set_title('BASE3: ' . $name);
 $PAGE->set_heading('BASE3: ' . $name);
 
-// Load the normal ClientStack loader for dynamically embedded BASE3 displays.
-\local_base3\Runtime::boot();
-$resolver = \local_base3\Runtime::container()->get(\Base3\Api\IAssetResolver::class);
-$asset = 'plugin/ClientStack/assets/assetloader/assetloader.min.js';
-$url = $resolver->resolve($asset);
-if ($url !== $asset) $PAGE->requires->js(new moodle_url($url), false);
+// Register the shared ClientStack loader through the Moodle runtime.
+\local_base3\Runtime::requireClientStackAssetLoader();
 
 echo $OUTPUT->header();
 echo \local_base3\Runtime::render($name, $data);

@@ -98,3 +98,32 @@ installer synchronizes the deletion to Moodle's `public/` directory and
 publishes ClientStack assets. The old chatbot icon SVG is retained.
 
 See `moodle/local/base3/README_CHATBOT.md` and `PRIVACY.md` for details.
+
+## Embedded ClientStack loader in Moodle
+
+Moodle-owned JavaScript dependencies for embedded BASE3 displays use
+`$PAGE->requires->js(..., false)` rather than injecting duplicate raw
+`<script>` tags. This shares Moodle's per-page duplicate elimination with
+the administration and generic display endpoints. ClientStack's separate
+`marked.js` Markdown renderer remains managed by the modular chatbot plugin.
+To check Markdown failures, inspect the marked script in the browser network
+panel and test `typeof window.marked?.parse` in the console.
+
+
+## Moodle Markdown and ClientStack loader correction (18 October 2026)
+
+The modular chatbot's local `marked.js` UMD bundle registers as an AMD module
+when Moodle RequireJS is present. ClientStack's shared `MarkdownPlugin` now
+resolves that module after the script loads. ILIAS and WordPress still use the
+original global parser path. This correction is made in both
+`modules/ClientStack/dev/ModularChatbot/src/plugins/MarkdownPlugin.js` and
+`modules/ClientStack/assets/modularchatbot/plugins/MarkdownPlugin.js`.
+
+All three Moodle entry points (`Runtime::renderEmbedded`,
+`AdminTools::requireAssets`, and `display.php`) now use the same
+`Runtime::requireClientStackAssetLoader()` registration, ensuring one Moodle
+requirement per request even if entry points overlap. No separate route or
+parser is introduced.
+
+Checks: `php test/MoodleAssetLoaderSmokeTest.php` and
+`node modules/ClientStack/test/MarkdownPluginAmdSmokeTest.mjs`.

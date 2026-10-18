@@ -22,7 +22,7 @@ final class Runtime {
 	private static bool $booting = false;
 	private static bool $finished = false;
 	private static ?array $administrationDisplays = null;
-	private static bool $embeddedLoaderIncluded = false;
+	private static bool $assetLoaderRegistered = false;
 
 	public static function boot(): void {
 		if (self::$container !== null) return;
@@ -96,16 +96,24 @@ final class Runtime {
 		}
 	}
 
-	/** Embed the same prepackaged ClientStack loader in Moodle block or filtered content. */
-	public static function renderEmbedded(string $name, mixed $data = null): string {
-		$html = self::render($name, $data);
-		if (self::$embeddedLoaderIncluded) return $html;
+	/** Register the shared browser loader once per Moodle request. */
+	public static function requireClientStackAssetLoader(): void {
+		if (self::$assetLoaderRegistered) return;
+		self::boot();
 		$resolver = self::container()->get(IAssetResolver::class);
 		$path = 'plugin/ClientStack/assets/assetloader/assetloader.min.js';
 		$url = $resolver->resolve($path);
 		if ($url === $path) throw new RuntimeException('ClientStack assetloader is missing.');
-		self::$embeddedLoaderIncluded = true;
-		return '<script src="' . htmlspecialchars($url, ENT_QUOTES, 'UTF-8') . '" defer></script>' . $html;
+		global $PAGE;
+		$PAGE->requires->js(new \moodle_url($url), false);
+		self::$assetLoaderRegistered = true;
+	}
+
+	/** Embed BASE3 displays with the registered ClientStack loader. */
+	public static function renderEmbedded(string $name, mixed $data = null): string {
+		$html = self::render($name, $data);
+		self::requireClientStackAssetLoader();
+		return $html;
 	}
 
 	public static function runWorker(): void {

@@ -85,10 +85,23 @@ actual deployment. The module's keyboard interactions and focus handling
 should be verified with the site's Moodle theme against BASE3's WCAG 2.2 AA
 baseline; source-level checks do not constitute a full accessibility audit.
 
-## Launcher button presentation (18 October 2026)
+## Moodle JavaScript loader registration (18 October 2026)
 
-The global Moodle launcher no longer references the native icon SVG.
-It uses the shared ClientStack default blue labeled button, matching
-WordPress. This change does not affect data processing, storage, access,
-deletion or recipients. The former SVG file remains in the native plugin
-tree but is not requested by the launcher.
+The embedded-display runtime now registers the existing local ClientStack
+`assetloader.min.js` via Moodle's built-in page requirements manager rather
+than inserting a second executable script tag. This is a client resource
+loading correction only. It adds no new data processing, storage, retention,
+recipient, transfer, or deletion behavior. The previously documented
+chatbot-related data handling and deployment checks remain unchanged.
+
+
+## Moodle Markdown AMD and duplicate loader correction (18 October 2026)
+
+The local ClientStack Markdown parser is now resolved through the already
+loaded RequireJS/AMD registry when Moodle is the host. The Moodle runtime
+coordinates the same previously deployed assetloader script across its
+entry points so the resource is registered once per request. Both changes
+concern the handling of locally served scripts; no personal data categories,
+storage, retention period, recipient, external transfer, authorization
+rule, or deletion behavior are added or altered. The existing chatbot
+processing and host log considerations documented above remain applicable.
