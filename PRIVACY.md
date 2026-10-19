@@ -105,3 +105,46 @@ concern the handling of locally served scripts; no personal data categories,
 storage, retention period, recipient, external transfer, authorization
 rule, or deletion behavior are added or altered. The existing chatbot
 processing and host log considerations documented above remain applicable.
+
+## BASE3 authorization in native Moodle (19 October 2026)
+
+The Moodle integration now evaluates BASE3 feature visibility and logical
+group membership against current Moodle identity metadata. Native Moodle
+context-specific permissions are checked with `has_capability()`, role
+membership with `get_user_roles()`, and course-group membership with Moodle
+native group services. No independent copy of native Moodle roles,
+capabilities, course-group memberships or user accounts is created.
+
+Moodle-backed `ISettingsStore` persists optional custom BASE3 group names,
+descriptions and membership expressions under `base3moodle/groups`, and
+configured feature audiences under `base3_authorization_features/catalog`.
+These records may include native Moodle user IDs, role and context IDs,
+course-group IDs, group names, exact login names, complete email addresses,
+domains and other fields declared by enabled third-party criteria. A code
+allowlist of bootstrap developer logins or verified emails may also appear in
+`Base3MoodleLab` project source and its repository/deployment backups.
+
+The UI writes through the existing authenticated same-origin Moodle AJAX
+endpoint and checks Moodle session keys. Only current Moodle site
+administrators belonging to BASE3 `development` can edit group and feature
+assignments. A BASE3 group membership never grants native Moodle
+administrator privileges. The generic rights inspector is read-only and
+shows only direct CAP_ALLOW grants: no native Moodle role records are
+modified by that inspector.
+
+Managed group deletion removes the current configuration record only when
+no feature references the group. Native Moodle roles and course-group
+memberships are neither deleted nor rewritten. This change adds no separate
+network recipient or new authorization data table; other configured BASE3
+and AI services may have additional recipients not covered by this review.
+The source does not specify retention periods or automatic deletion of
+host settings, logs, source backups or database backups. Host operators must
+assess access, retention, correction, erasure, backups and the specific
+attributes of optional custom criteria in their deployment privacy notice.
+
+The shared audience UIs provide labelled inputs, keyboard-usable actions,
+server-side validation, session-key checks and live feedback. Their actual
+screen-reader/focus behavior must be verified with the deployed Moodle 5.3
+theme; isolated syntax and smoke tests do not establish WCAG 2.2 AA compliance.
+See `modules/Base3Moodle/PRIVACY.md` and
+`modules/Base3MoodleLab/PRIVACY.md` for ownership of specific processing.

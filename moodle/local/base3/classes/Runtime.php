@@ -83,6 +83,7 @@ final class Runtime {
 			}
 			$names = ['tabcontroldisplay' => true];
 			foreach ($settings->getAdministrationConfig() as $tab) {
+				if (($tab['administrative'] ?? true) === false) continue;
 				foreach (($tab['displays'] ?? []) as $entry) {
 					$nameKey = (string) ($entry['display'] ?? $entry['name'] ?? '');
 					if ($nameKey !== '') $names[$nameKey] = true;

@@ -127,3 +127,43 @@ parser is introduced.
 
 Checks: `php test/MoodleAssetLoaderSmokeTest.php` and
 `node modules/ClientStack/test/MarkdownPluginAmdSmokeTest.mjs`.
+
+## BASE3 authorization and Moodle RBAC (19 October 2026)
+
+The embedded integration now binds `IAuthorizationService` under the native
+Moodle authority, shares the framework's `IUserCriterion` evaluation for
+BASE3 Groups and Features, and evaluates host capabilities in native Moodle
+contexts. Moodle role and course-group assignment remain Moodle's own data;
+no second RBAC storage or compatibility `IUsermanager::can()` path is used.
+
+The BASE3 administration exposes Groups and Features to native Moodle site
+administrators who also belong to BASE3 `development`. Regular Moodle
+administrators have reduced BASE3 navigation, while games are governed by
+their declared features. Native Permissions are displayed read-only using
+Moodle context IDs; edit Moodle-native role-capability grants in Moodle itself.
+
+**Before restricting the administration**, enter at least one trusted Moodle
+login name in
+`modules/Base3MoodleLab/src/Group/MoodleLabDevelopmentGroup.php`, under
+`BOOTSTRAP_USERNAMES`. This project-owned fixed membership is independent of
+Moodle user IDs and cannot be removed through BASE3 Groups. Full email
+addresses may be used only where verification and account-change security
+are guaranteed; a bare domain is not suitable for bootstrap admin access.
+
+After applying the authorization patch, run `./base3/install.sh` from the
+Moodle root to synchronize the native integration and new Moodle authorization
+CSS/JS assets. The project-owned class map refreshes on the following BASE3
+bootstrap. No replacement of the native Moodle role/capability system or
+additional BASE3 authorization migration tables is needed.
+
+Run the following smoke tests from the BASE3 source directory:
+
+```sh
+php modules/Base3Moodle/test/Authorization/MoodleAuthorizationSmokeTest.php
+php modules/Base3Moodle/test/Adapter/Base3MoodleFileManagerOutputSmokeTest.php
+php modules/Base3MoodleLab/test/GlobalChatbotLauncherSmokeTest.php
+```
+
+The native Moodle 5.3 runtime remains the authoritative target for integration
+and accessibility verification. See `modules/Base3Moodle/README.md` for the
+exact authority/criterion mapping, scope boundaries, and deployment tests.

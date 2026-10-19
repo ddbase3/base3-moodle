@@ -45,6 +45,8 @@ try {
 	error_log('[BASE3][AJAX] ' . $error->getMessage());
 	if ($error instanceof \required_capability_exception || $error instanceof \require_login_exception) {
 		http_response_code(403);
+	} elseif ($error instanceof InvalidArgumentException) {
+		http_response_code(400);
 	} elseif ($error instanceof RuntimeException && str_starts_with($error->getMessage(), 'BASE3 output is not installed:')) {
 		http_response_code(404);
 	} else {

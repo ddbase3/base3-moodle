@@ -18,7 +18,7 @@ final class AdminTools {
 		$tab = $c->get(IClassMap::class)->getInstanceByInterfaceName(IDisplay::class, 'tabcontroldisplay');
 		if (!$tab instanceof IDisplay) throw new RuntimeException('ClientStack TabControlDisplay is not installed.');
 		$active = isset($_GET['view']) && is_scalar($_GET['view']) ? trim((string) $_GET['view']) : '';
-		$tab->setData(['tabs' => $settings->getAdministrationConfig(), 'active' => $active,
+		$tab->setData(['tabs' => $settings->getVisibleAdministrationConfig(), 'active' => $active,
 			'empty_message' => get_string('notools', 'local_base3')]);
 		return $tab->getOutput('html', false);
 	}
