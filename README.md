@@ -167,3 +167,25 @@ php modules/Base3MoodleLab/test/GlobalChatbotLauncherSmokeTest.php
 The native Moodle 5.3 runtime remains the authoritative target for integration
 and accessibility verification. See `modules/Base3Moodle/README.md` for the
 exact authority/criterion mapping, scope boundaries, and deployment tests.
+
+## Global chatbot launcher feature (21 October 2026)
+
+`Base3MoodleLab` declares `globalchatbotlauncherfeature`, defaulting to the
+code-owned `authenticated` BASE3 group. The native Moodle footer hook shows
+the floating launcher only on ALLOW, and the existing AJAX display transport
+returns HTTP 403 for an unauthorized `chatbot/default` load. Embedded chatbots
+with separate configuration names remain available. The former native Moodle
+enabled/visibility settings are removed from the administration form; old
+stored values are left untouched. No new endpoint or feature decision service
+is introduced.
+
+Apply the patch in the `base3/` source directory and run `./install.sh` to
+publish the Moodle native plugin changes. Run:
+
+```sh
+php modules/Base3MoodleLab/test/GlobalChatbotLauncherSmokeTest.php
+php test/GlobalChatbotAjaxAuthorizationSmokeTest.php
+```
+
+A full installed Moodle runtime test is still needed to verify feature
+discovery, current-user group evaluation, HTTP status handling and theme UI.

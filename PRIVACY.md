@@ -67,8 +67,7 @@ The launcher reads its presentation flags from the BASE3 `SettingsStore`
 dataset `global-chatbot-launcher/default`. On the first render, previously
 stored Moodle launcher flags are migrated to that dataset only if it is absent.
 The old native flags are not deleted from Moodle configuration by this patch,
-but are no longer read after the canonical dataset exists. Moodle's separate
-native enabled/visibility configuration remains in use.
+but are no longer read after the canonical dataset exists. The separate native enabled/visibility configuration is no longer used after the global-launcher feature change (21 October 2026).
 
 The shared ClientStack script uses browser `localStorage` to retain a selected
 window mode and individual window sizes, and `sessionStorage` to restore an
@@ -148,3 +147,21 @@ screen-reader/focus behavior must be verified with the deployed Moodle 5.3
 theme; isolated syntax and smoke tests do not establish WCAG 2.2 AA compliance.
 See `modules/Base3Moodle/PRIVACY.md` and
 `modules/Base3MoodleLab/PRIVACY.md` for ownership of specific processing.
+
+## Global chatbot feature and native setting removal (21 October 2026)
+
+The global floating chatbot is controlled by the BASE3
+`feature/globalchatbotlauncherfeature` audience in `Base3MoodleLab`. Its
+default `authenticated` membership uses the existing Moodle adapter and may
+be overridden by the existing BASE3 Feature administration. Launcher display
+and AJAX loading of `chatbot/default` require an ALLOW decision. Independent
+embedded chatbot identities and the general conversation backends are not
+automatically covered by the launcher feature.
+
+The previous `local_base3/chatbotbubble_enabled` and
+`local_base3/chatbotbubble_visibility` values are no longer read or exposed
+in native Moodle settings; existing values are not automatically erased from
+the host database or backups. No new standalone user store, external recipient,
+transfer path or retention period is introduced. The deployment operator must
+assess access logs, historical config retention, model-provider processing,
+feature-audience personal data and accessibility of denied AJAX feedback.

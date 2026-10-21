@@ -2,28 +2,21 @@
 
 namespace local_base3;
 
-/** Native Moodle visibility boundary for the shared global chatbot launcher. */
+use Base3\Authorization\Api\IAuthorizationService;
+use Base3\Authorization\Dto\AuthorizationRequest;
+use Base3\Usermanager\Permission;
+use Base3MoodleLab\Feature\GlobalChatbotLauncherFeature;
+
+/** Checks the single BASE3 feature decision for Moodle's floating launcher. */
 final class ChatbotBubble {
 
-	public static function enabled(): bool {
-		return (bool) get_config('local_base3', 'chatbotbubble_enabled');
-	}
-
 	public static function visible(): bool {
-		if (!self::enabled()) return false;
 		if (function_exists('during_initial_install') && during_initial_install()) return false;
-
-		$visibility = (string) (get_config('local_base3', 'chatbotbubble_visibility') ?: 'authenticated');
-		switch ($visibility) {
-			case 'all':
-				return true;
-			case 'authenticated':
-				return isloggedin() && !isguestuser();
-			case 'administrators':
-				return isloggedin() && !isguestuser()
-					&& has_capability('moodle/site:config', \context_system::instance());
-			default:
-				return false;
-		}
+		Runtime::boot();
+		$authorization = Runtime::container()->get(IAuthorizationService::class);
+		return $authorization->decide(new AuthorizationRequest(
+			$authorization->getDefaultAuthority(),
+			Permission::for('feature', GlobalChatbotLauncherFeature::getName())
+		))->isAllowed();
 	}
 }

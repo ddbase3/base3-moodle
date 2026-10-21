@@ -14,11 +14,3 @@ $string['globaldisplaydesc'] = 'Optionales BASE3 Display im Footer aller Moodle-
 $string['globaldata'] = 'BASE3 Displaydaten (JSON)';
 $string['globaldatadesc'] = 'Optionale JSON-Daten für das konfigurierte Display.';
 
-$string['chatbotbubble'] = 'Globaler Chatbot: Sichtbarkeit';
-$string['chatbotbubble_enabled'] = 'Schwebenden Chatbot anzeigen';
-$string['chatbotbubble_enableddesc'] = 'Zeigt den globalen BASE3-Chatbot auf Moodle-Seiten an. Darstellung unter BASE3 Werkzeuge > Chatbot > Launcher konfigurieren.';
-$string['chatbotbubble_visibility'] = 'Sichtbar für';
-$string['chatbotbubble_visibilitydesc'] = 'Legt fest, wer den Chatbot sehen und öffnen darf. Bei öffentlicher Freigabe kann KI-Nutzung ohne Anmeldung entstehen.';
-$string['chatbotbubble_all'] = 'Alle, auch Gäste';
-$string['chatbotbubble_authenticated'] = 'Nur angemeldete Benutzer';
-$string['chatbotbubble_administrators'] = 'Nur Administratoren';

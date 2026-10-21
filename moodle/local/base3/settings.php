@@ -25,22 +25,4 @@ if ($hassiteconfig) {
 	}
 	$ADMIN->add('local_base3_category', $global);
 
-	// Native Moodle settings control visibility only. Launcher presentation is
-	// configured centrally under BASE3 Tools > Chatbot > Launcher.
-	$bubble = new admin_settingpage('local_base3_chatbotbubble', new lang_string('chatbotbubble', 'local_base3'));
-	if ($ADMIN->fulltree) {
-		$bubble->add(new admin_setting_configcheckbox(
-			'local_base3/chatbotbubble_enabled', new lang_string('chatbotbubble_enabled', 'local_base3'),
-			new lang_string('chatbotbubble_enableddesc', 'local_base3'), '0'
-		));
-		$bubble->add(new admin_setting_configselect(
-			'local_base3/chatbotbubble_visibility', new lang_string('chatbotbubble_visibility', 'local_base3'),
-			new lang_string('chatbotbubble_visibilitydesc', 'local_base3'), 'authenticated', [
-				'all' => new lang_string('chatbotbubble_all', 'local_base3'),
-				'authenticated' => new lang_string('chatbotbubble_authenticated', 'local_base3'),
-				'administrators' => new lang_string('chatbotbubble_administrators', 'local_base3')
-			]
-		));
-	}
-	$ADMIN->add('local_base3_category', $bubble);
 }

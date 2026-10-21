@@ -1,21 +1,19 @@
 # Global BASE3 chatbot in Moodle
 
 The global chatbot uses the same `ClientStack` ES module and CSS as ILIAS and
-WordPress. Moodle supplies only the host visibility decision, the generic
-BASE3 display URL, and the docking selectors. There is no separate Moodle
-launcher JavaScript or CSS.
+WordPress. The BASE3 feature `globalchatbotlauncherfeature` determines who may
+use the floating button and its AJAX display load. Moodle supplies the generic
+BASE3 display URL and docking selectors. There is no separate Moodle launcher
+JavaScript or CSS.
 
 ## Install or update
 
-1. Pull the current `ClientStack` module, including
-   `assets/globalchatbotlauncher/` and `assets/assetloader/`.
-2. Apply the Moodle launcher patch under the `base3/` source directory.
-3. Execute `sh ./remove-obsolete-moodle-global-chatbot-launcher.sh` to remove
-   the old Moodle launcher and iframe endpoint from the source tree.
-4. Execute `./install.sh` to synchronize `moodle/` to Moodle's `public/`
-   directory and publish the updated ClientStack assets.
-5. Use Moodle's normal cache management if the previous native configuration
-   form or old assets are still displayed.
+1. Pull the current `Base3Framework`, `Base3Moodle`, `Base3MoodleLab`,
+   `ClientStack` and `Chatbot` modules.
+2. Apply the feature patch under the existing `base3/` source directory.
+3. Execute `./install.sh` to synchronize `moodle/` to Moodle's `public/`
+   directory and publish the shared ClientStack assets.
+4. Purge Moodle caches if the former native visibility controls remain visible.
 
 No Moodle core edits, independent AJAX endpoint or new backend are needed.
 
@@ -31,12 +29,17 @@ In **BASE3 tools > Chatbot**:
   `global-chatbot-launcher/default`.
 - **Extensions** remains unchanged.
 
-In **Site administration > Plugins > BASE3 Moodle > Global chatbot
-visibility**, enable the launcher and choose who may see it (everyone,
-authenticated users, or site administrators). Moodle-specific access visibility
-stays there; the presentation options are not duplicated in Moodle settings.
-Enabling public visibility does not itself grant permissions to model or
-backend services. Review actual backend permissions before public use.
+In **BASE3 > Features**, configure **Global chatbot launcher**. Its
+code-defined default audience is the `authenticated` BASE3 group, so the
+floating button is enabled for signed-in Moodle users without a separate
+native checkbox. A saved feature audience override takes precedence, including
+an explicitly empty audience, which denies access. The old Moodle
+`chatbotbubble_enabled` and `chatbotbubble_visibility` settings are no longer
+read, but their previously stored values are not deleted automatically.
+
+This permission controls the floating button and the existing AJAX load of
+`chatbot/default` only. It does not grant or deny access to unrelated chatbot
+records, embeddings, agent tools or AI backend operations.
 
 Former native Moodle window options are copied once to the canonical BASE3
 launcher settings when no such record exists. Subsequent changes use only the
@@ -65,20 +68,23 @@ integrations. Configure each chatbot record separately and reference its own
 {"config_group":"chatbot","config_name":"course-math"}
 ```
 
-Do not share `chatbot/default` with independent content chatbots unless sharing
-the global settings is deliberate. No content configuration is changed by the
-launcher patch.
+Independent content chatbots with their own group/name remain available
+regardless of the launcher feature. Requests explicitly targeting the shared
+`chatbot/default` instance are governed by the same feature, even when issued
+from another page. Do not share that configuration with a separately authorized
+embedded chatbot. No content configuration is changed by the feature patch.
 
 ## Diagnostics
 
-- **No button:** check native Moodle visibility settings, login state and the
-  `before_standard_footer_html_generation` hook.
+- **No button:** check the effective `globalchatbotlauncherfeature` audience
+  under BASE3 > Features and the `before_standard_footer_html_generation` hook.
 - **No shared styles or module:** check that `./install.sh` published
   `public/local/base3/assets/ClientStack/globalchatbotlauncher/` and the
   `assetloader` assets from the pulled ClientStack module.
 - **Could not load chatbot:** inspect the GET request for
   `/local/base3/ajax.php?name=chatbotdisplay` and the Moodle/PHP logs. The
-  request must contain the encoded global instance data.
+  request must contain the encoded global instance data. A denied feature
+  returns HTTP 403 before the shared chatbot display is executed.
 - **Messages cannot send:** inspect the same generic BASE3 transport and the
   chatbot's configured services; POST requests require Moodle's `sesskey`.
 - **Admin launcher settings do not save:** verify the existing generic BASE3

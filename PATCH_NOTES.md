@@ -66,3 +66,14 @@ by `./base3/install.sh` from the Moodle root. No obsolete source files or
 new authorization schema migrations are part of this patch. Run the three
 new/updated standalone smoke tests listed in `README.md`. Test live Moodle
 context/role and direct-endpoint behavior separately before production use.
+
+# Moodle global chatbot feature (21 October 2026)
+
+Add one discoverable `IFeature` in `Base3MoodleLab` for the global floating
+chatbot button and the existing `chatbot/default` AJAX display. The code
+default is `authenticated`. The existing Moodle feature administration owns
+audience overrides and the existing authorization service decides access.
+Remove the obsolete Moodle enabled/visibility form; retain stored historical
+values without interpreting them. Other embedded chatbot configurations,
+retrieval tools and agent APIs remain unchanged. The patch includes isolated
+PHP smoke tests for authorization and AJAX request separation.
