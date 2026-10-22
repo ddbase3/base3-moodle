@@ -77,3 +77,21 @@ Remove the obsolete Moodle enabled/visibility form; retain stored historical
 values without interpreting them. Other embedded chatbot configurations,
 retrieval tools and agent APIs remain unchanged. The patch includes isolated
 PHP smoke tests for authorization and AJAX request separation.
+
+# Moodle usermanager completeness (22 October 2026)
+
+Complete the existing `MoodleUsermanager` adapter against the current BASE3
+interface. Detailed identities include native system-context roles, the
+Moodle capability catalog is complete, and directory listings remain
+identity-only. Native Moodle role assignment, manual-role removal and
+site-wide capability changes enforce host permission and role constraints.
+Moodle-native account creation and password changes enforce validation,
+password history, forced-change handling and session restrictions.
+Unsupported group-to-role inheritance remains unsupported by design.
+
+No new service registrations, routes, tables, migrations, assets, translation
+keys or alternative authorization paths are introduced. Seven files are
+shipped as a complete `unzip -o` update, including source, regression tests,
+README and privacy changes. Isolated PHP smoke tests exercise native API
+stubs; production authentication, role and permission behavior requires a
+Moodle 5.3 integration test.

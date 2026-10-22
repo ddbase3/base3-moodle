@@ -165,3 +165,26 @@ the host database or backups. No new standalone user store, external recipient,
 transfer path or retention period is introduced. The deployment operator must
 assess access logs, historical config retention, model-provider processing,
 feature-audience personal data and accessibility of denied AJAX feedback.
+
+## Moodle usermanager identity and account operations (22 October 2026)
+
+`modules/Base3Moodle/src/Adapter/MoodleUsermanager.php` resolves current and
+individually selected user identities, native system-context roles and
+capability metadata through Moodle, while identity-only directory queries
+return usernames, names, email addresses and language information to
+appropriately authorized callers. User registration and password replacement
+process submitted credentials transiently using Moodle's native validation,
+manual authentication plugin, password history and configured session
+invalidation. Authorized changes to manually assigned system roles and
+site-wide capability grants update Moodle's own native database records.
+
+The adapter introduces no new independent BASE3 account store, capability
+store, recipient or network transfer. Moodle persists accounts, hashed
+credentials, history, roles, capability overrides and relevant native events
+according to the installed host and authentication plugins. This source
+does not establish their retention/deletion periods or the handling of host
+logs, backups, external authentication services or deployment-specific data
+subject requests. Those obligations remain with the Moodle site operator.
+The shared native Permissions inspector remains read-only; the native
+mutations documented here are separate `IUsermanager` methods subject to
+host-side capability checks. No interactive interface is changed by this patch.

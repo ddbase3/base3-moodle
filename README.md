@@ -189,3 +189,32 @@ php test/GlobalChatbotAjaxAuthorizationSmokeTest.php
 
 A full installed Moodle runtime test is still needed to verify feature
 discovery, current-user group evaluation, HTTP status handling and theme UI.
+
+## Moodle usermanager completion (22 October 2026)
+
+The existing `modules/Base3Moodle/src/Adapter/MoodleUsermanager.php`
+implements the current BASE3 `IUsermanager` identity and native metadata
+contract without adding a second authorization service. Detailed single-user
+lookups expose Moodle system roles, directory lists stay identity-only, and
+capability catalogs use Moodle's native capability definitions. Authorized
+role assignments and global capability changes use the existing Moodle APIs;
+course-group-to-role assignment is explicitly unsupported. Moodle continues
+to decide native access through `IAuthorizationService`.
+
+The update also validates native registration and manual-password changes,
+including password history and impersonated-session restrictions. It does not
+add routes, assets, a settings store, a database table or a migration. The
+existing Moodle module service registration is unchanged. No `./install.sh`
+asset synchronization is needed solely for this PHP module update.
+
+Apply the patch in this BASE3 Moodle source root and run:
+
+```sh
+unzip -o base3_moodle_usermanager_patch.zip
+php modules/Base3Moodle/test/Adapter/MoodleUsermanagerSmokeTest.php
+```
+
+Perform an additional integrated test with the configured Moodle 5.3 user,
+role, password-policy and permission settings before enabling account or role
+management in a production site. See `modules/Base3Moodle/README.md` and
+`modules/Base3Moodle/PRIVACY.md` for limitations and data lifecycle details.
