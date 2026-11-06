@@ -38,6 +38,62 @@ an environment with filesystem write access to the Moodle installation and
 `rsync` available; it does not assume a particular web server or deployment
 system.
 
+## Moodle generic settings and native file storage (November 2026)
+
+This release uses the shared `ClientStack\Display\SettingsDisplay` and
+`UiFoundation\Api\ISettingsTab` discovery. Moodle no longer owns an extra
+static administration tab list. The existing `moodle/local/base3` admin entry
+uses `settingsdisplay` and the same server-side Moodle capabilities and BASE3
+feature checks as direct AJAX requests. Project `Base3MoodleLab` supplies the
+single `chatbot/default` display data record; generic Chatbot, UiFoundation,
+ClientStack and other module settings tabs stay in their owning modules.
+
+`ClientStack\GlobalChatbotLauncher\GlobalChatbotLauncherFeature` now owns the
+launcher feature globally. The duplicate MoodleLab feature has been removed;
+no feature-audience migration is performed. A trusted developer must still
+have native Moodle site administration and BASE3 `development` membership.
+The installed project has exact bootstrap login `admin` in
+`MoodleLabDevelopmentGroup`. Adjust feature audiences manually in the
+BASE3 Features administration as required.
+
+The existing 13-action FileManager endpoint now stores completed files in the
+native Moodle File API, under system context, component `local_base3`, area
+`base3storage`, item ID 0 and owner-specific private directory paths. The
+existing `MoodleFileStorage` and managed upload services remain the owners;
+no FileBridge plugin or replacement HTTP route is installed. No old files
+need migrating on this development environment. Incomplete uploads still use
+private temporary chunk files; successful and explicitly aborted uploads
+remove their sessions, but unattended orphan-cleanup is not implemented.
+
+From the Moodle root, deploy the patch using:
+
+```sh
+unzip -o base3-moodle-generic-integration.patch.zip
+sh base3/remove-obsolete-moodle-settings.sh
+./base3/install.sh
+```
+
+No native Moodle schema or plugin-version migration is required for this
+source-only integration update. The installer never modifies Moodle core
+or the common BASE3 modules. The removal script deletes only five obsolete
+Moodle-specific source declarations, including the duplicate anonymous and
+authenticated group definitions, and is safe to repeat.
+
+Local verification without Moodle:
+
+```sh
+php base3/modules/Base3Moodle/test/Adapter/Base3MoodleFileManagerOutputSmokeTest.php
+php base3/modules/Base3Moodle/test/Adapter/MoodleNativeFileStorageSmokeTest.php
+php base3/modules/Base3MoodleLab/test/GlobalChatbotLauncherSmokeTest.php
+php base3/modules/Base3Moodle/test/Authorization/MoodleAuthorizationSmokeTest.php
+```
+
+The last test needs the PHP `mbstring` extension. Production verification must
+also include actual Moodle native file operations, logged-out/denied AJAX,
+CSRF, feature visibility, installer asset URLs, keyboard and screen-reader
+interaction under the deployed Moodle 5.3 theme. A CLI smoke test is not a
+substitute for these host checks. See `PRIVACY.md` and module READMEs.
+
 ## FileManager dispatch
 
 The chatbot configuration's 13 FileManager actions use the existing generic
@@ -46,8 +102,11 @@ The chatbot configuration's 13 FileManager actions use the existing generic
 current user has Moodle's `moodle/site:config` capability through the existing
 BASE3 `IUsermanager` and validates the Moodle `sesskey` for both uploads and
 downloads. It forwards requests to the existing `MoodleFileManagerHttpService`.
-The file storage owner remains `chatbot/default`. Upload protocol and storage
-are unchanged.
+The file storage owner remains `chatbot/default`. Temporary upload chunks
+are collected under Moodle's private `moodledata/base3/filemanager-upload/`;
+completed files now use the native Moodle File API (`local_base3`, private
+`base3storage` area in system context). No legacy file migration is needed for
+this development installation.
 
 When applying the October 2026 cleanup patch, remove the obsolete
 `moodle/local/base3/filemanager.php` source with the included script, then run
@@ -66,6 +125,22 @@ otherwise throw a browser `RangeError` before the user message is displayed.
 The generic AJAX dispatch, chat transport and the shared ClientStack script
 are unchanged. Run `./install.sh` after applying changes to the Moodle sources.
 
+## Moodle administration settings visibility repair (6 November 2026)
+
+The current BASE3 Framework declares the logical `anonymous` and
+`authenticated` groups. Older Moodle adapters also declared them, causing
+`MoodleGroupConfiguration::getEntries()` to reject the duplicated group names.
+Every discovered settings feature then failed closed, leaving the BASE3
+administration without available tabs even for trusted developers.
+
+After applying `base3-moodle-admin-settings-fix.patch.zip` from the Moodle root,
+run `sh base3/remove-obsolete-moodle-settings.sh`. The updated existing removal
+script also deletes the two duplicate Moodle group definitions. No generic
+module, authorization decision or stored audience needs modification.
+The Moodle bootstrap source fingerprint automatically regenerates the class map
+when source files change. The fixed developer login remains exactly `admin` in
+`Base3MoodleLab`, with native site administration required for group/feature edits.
+
 ## Unified global chatbot launcher (ClientStack)
 
 The global chatbot now uses the same `ClientStack` ES module and CSS as ILIAS
@@ -78,8 +153,8 @@ JavaScript/CSS or custom chatbot HTTP endpoint remains.
 In BASE3 tools > Chatbot, the **Configuration** tab owns the global
 `chatbot/default` instance, **Launcher** owns the shared presentation settings
 (`global-chatbot-launcher/default`), and **Extensions** remains unchanged.
-Moodle's native plugin settings control only launcher enablement and viewer
-visibility. Previously configured native window options are imported once
+The shared `ClientStack` feature `globalchatbotlauncherfeature` controls
+launcher visibility, not native Moodle plugin checkboxes. Previously configured native window options are imported once
 when the central BASE3 dataset is absent; the old native group/name selector
 is no longer used. Individual content chatbot displays retain independent
 configuration identities.
@@ -170,8 +245,8 @@ exact authority/criterion mapping, scope boundaries, and deployment tests.
 
 ## Global chatbot launcher feature (21 October 2026)
 
-`Base3MoodleLab` declares `globalchatbotlauncherfeature`, defaulting to the
-code-owned `authenticated` BASE3 group. The native Moodle footer hook shows
+`ClientStack` declares the single shared `globalchatbotlauncherfeature`,
+defaulting to the code-owned `authenticated` BASE3 group. The native Moodle footer hook shows
 the floating launcher only on ALLOW, and the existing AJAX display transport
 returns HTTP 403 for an unauthorized `chatbot/default` load. Embedded chatbots
 with separate configuration names remain available. The former native Moodle

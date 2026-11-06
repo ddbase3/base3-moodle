@@ -6,7 +6,10 @@ use Base3\Api\IClassMap;
 use Base3\Api\IContainer;
 use Base3\Api\IDisplay;
 use Base3\Api\IAssetResolver;
-use Base3Moodle\Api\IBase3MoodleSettings;
+use Base3\Authorization\Api\IAuthorizationService;
+use Base3\Authorization\Dto\AuthorizationRequest;
+use Base3\Usermanager\Permission;
+use UiFoundation\Api\ISettingsTab;
 use Base3\Api\IOutput;
 use Base3\Hook\Api\IHookManager;
 use Base3\Logger\Api\ILogger;
@@ -73,28 +76,33 @@ final class Runtime {
 	}
 
 
-	/** The administration tabs are already the project-owned source of truth. */
+	/** Direct entry points must enforce native administration and the tab's feature decision. */
 	public static function assertDisplayAccess(string $name): void {
 		self::boot();
-		if (self::$administrationDisplays === null) {
-			$settings = self::container()->get(IBase3MoodleSettings::class);
-			if (!$settings instanceof IBase3MoodleSettings) {
-				throw new RuntimeException('BASE3 Moodle administration settings service unavailable.');
-			}
-			$names = ['tabcontroldisplay' => true];
-			foreach ($settings->getAdministrationConfig() as $tab) {
-				if (($tab['administrative'] ?? true) === false) continue;
-				foreach (($tab['displays'] ?? []) as $entry) {
-					$nameKey = (string) ($entry['display'] ?? $entry['name'] ?? '');
-					if ($nameKey !== '') $names[$nameKey] = true;
-				}
-			}
-			self::$administrationDisplays = $names;
-		}
-		if (isset(self::$administrationDisplays[$name])) {
+		if (in_array($name, ['settingsdisplay', 'tabcontroldisplay'], true)) {
 			require_login();
 			require_capability('moodle/site:config', \context_system::instance());
+			return;
 		}
+
+		$administration = [];
+		if (self::$administrationDisplays === null) {
+			foreach (self::container()->get(IClassMap::class)->getInstancesByInterface(ISettingsTab::class) as $tab) {
+				if (!$tab instanceof ISettingsTab) continue;
+				$display = $tab->getDisplayName();
+				if ($display === null || $display === '') continue;
+				if ($tab->getParentTabName() === 'gamessettingstab') continue;
+				$administration[$display][] = $tab;
+			}
+			self::$administrationDisplays = $administration;
+		}
+		if (!isset(self::$administrationDisplays[$name])) return;
+		require_login();
+		require_capability('moodle/site:config', \context_system::instance());
+		foreach (self::$administrationDisplays[$name] as $tab) {
+			if ($tab->isVisible()) return;
+		}
+		throw new RuntimeException('BASE3 administration feature access denied.');
 	}
 
 	/** Register the shared browser loader once per Moodle request. */

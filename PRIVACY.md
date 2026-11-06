@@ -1,7 +1,7 @@
 # BASE3 Moodle: processing and deployment notes
 
 This describes behavior verified in the provided BASE3 Moodle source snapshot
-(17 October 2026). It is not a deployment privacy notice or a legal compliance
+(6 November 2026). It is not a deployment privacy notice or a legal compliance
 assertion.
 
 ## Data and purposes
@@ -15,8 +15,11 @@ paths, upload metadata and file contents to manage chatbot resources.
 ## Storage and retention
 
 `local_base3` sets `DIR_LOCAL` to `$CFG->dataroot/base3/`. The Moodle host
-storage adapter stores owner-scoped files in `DIR_LOCAL/storage/`.
-The existing chunk-upload service uses `DIR_LOCAL/filemanager-upload/` with
+storage adapter writes final file content via Moodle's native File API,
+using the system context, component `local_base3`, private filearea
+`base3storage`, item ID 0 and a private path derived from the logical owner.
+It does not write final content to `DIR_LOCAL/storage/`. The existing
+chunk-upload service uses `DIR_LOCAL/filemanager-upload/` with
 per-upload `meta.json` and chunk files. Successful finish or explicit abort
 removes an upload session. No automatic cleanup of abandoned sessions is
 verified in the provided code; operators must assess and define a retention
@@ -27,14 +30,17 @@ policy. Other BASE3 plugins can persist additional data outside this scope.
 The new FileManager output requires an authenticated BASE3 user identity,
 checks `moodle/site:config` via `IUsermanager`, and validates Moodle's current
 `sesskey`. The generic AJAX transport also requires a sesskey for POSTs.
-The underlying owner-scoped file storage, upload validation and private
-Moodle dataroot location are unchanged by this patch. Actual file-system and
+FileManager final-file persistence now uses Moodle's native stored-file
+records and content addressing, rather than a BASE3 local-file directory.
+Completed uploads are assembled transiently in `DIR_TMP` and copied to Moodle
+storage without reading the full assembled file into PHP memory. Actual file-system and
 web-server permissions depend on deployment configuration.
 
 ## Recipients, transfers and deletion
 
-The FileManager dispatch change does not add a recipient, remote transfer, or
-new persistence backend. Other configured chatbot/AI services are outside its
+The file storage change adds no external recipient or network transfer.
+It deliberately changes the local persistence backend to Moodle's private File
+API records/files, without a separate BASE3 file catalog. Other configured chatbot/AI services are outside its
 scope and require a separate deployment-specific inventory. File and directory
 operations of the existing storage backend implement deletion; they are not a
 substitute for deletion of backups and other independently stored data.
@@ -151,7 +157,7 @@ See `modules/Base3Moodle/PRIVACY.md` and
 ## Global chatbot feature and native setting removal (21 October 2026)
 
 The global floating chatbot is controlled by the BASE3
-`feature/globalchatbotlauncherfeature` audience in `Base3MoodleLab`. Its
+`feature/globalchatbotlauncherfeature` audience owned by `ClientStack`. Its
 default `authenticated` membership uses the existing Moodle adapter and may
 be overridden by the existing BASE3 Feature administration. Launcher display
 and AJAX loading of `chatbot/default` require an ALLOW decision. Independent
@@ -188,3 +194,41 @@ subject requests. Those obligations remain with the Moodle site operator.
 The shared native Permissions inspector remains read-only; the native
 mutations documented here are separate `IUsermanager` methods subject to
 host-side capability checks. No interactive interface is changed by this patch.
+
+## Moodle native File API and generic administration (6 November 2026)
+
+`Base3Moodle` now stores completed FileManager resources solely in Moodle's
+private `local_base3/base3storage` file area for the system context. The
+logical owner is encoded in owner-specific paths. Moodle's native file records
+and physical content store are the persistence owners. The previous
+`DIR_LOCAL/storage/` backend is not used; the development deployment has no
+retained legacy files and requires no migration. Upload chunks and metadata,
+including current Moodle user IDs, remain temporarily in
+`DIR_LOCAL/filemanager-upload/`; a transient concatenated file lives under
+`DIR_TMP` until a finish attempt completes. Explicit abort and successful
+completion delete the relevant upload session. There is no verified automatic
+orphan-session expiry; the operator must define maintenance and retention.
+
+Private files are delivered by Moodle `send_stored_file()` only after the
+existing generic BASE3 AJAX endpoint has authenticated the current user,
+checked Moodle `moodle/site:config` through `IAuthorizationService` and
+validated `sesskey`. Same-origin and browser security remain subject to
+Moodle configuration. The generic `ISettingsTab` administration uses the
+Moodle-native administrator boundary and BASE3 feature eligibility, including
+on direct output requests. Neither navigation visibility nor feature
+configuration provides an implicit native Moodle grant.
+
+Settings and launcher presentation choices use the existing Moodle-backed
+BASE3 `ISettingsStore`. The floating chatbot uses the single shared
+`ClientStack` feature; its authorized display remains `chatbot/default`.
+Previously saved feature visibility is not migrated by this release.
+
+Moodle native backup policies, database retention, file-pool maintenance and
+deleted-file recovery are deployment-controlled. File deletion through this
+adapter does not by itself erase backup copies or independently stored
+chatbot/AI records. No additional remote recipient, telemetry service, or
+cross-border transfer is introduced by these host adapters. Configured AI
+providers and other plugins may have different recipients and retention;
+operators must review their actual deployment. Native Moodle integration,
+WCAG 2.2 AA keyboard/screen-reader checks and legal obligations remain
+unverified until deployment testing.

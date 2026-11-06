@@ -5,7 +5,7 @@ namespace local_base3;
 use Base3\Authorization\Api\IAuthorizationService;
 use Base3\Authorization\Dto\AuthorizationRequest;
 use Base3\Usermanager\Permission;
-use Base3MoodleLab\Feature\GlobalChatbotLauncherFeature;
+use ClientStack\GlobalChatbotLauncher\GlobalChatbotLauncherFeature;
 
 /** Checks the single BASE3 feature decision for Moodle's floating launcher. */
 final class ChatbotBubble {
