@@ -2,18 +2,18 @@
 
 namespace local_base3;
 
-use Base3\Api\IClassMap;
-use Base3\Api\IContainer;
-use Base3\Api\IDisplay;
-use Base3\Api\IAssetResolver;
-use Base3\Authorization\Api\IAuthorizationService;
-use Base3\Authorization\Dto\AuthorizationRequest;
-use Base3\Usermanager\Permission;
-use UiFoundation\Api\ISettingsTab;
-use Base3\Api\IOutput;
-use Base3\Hook\Api\IHookManager;
-use Base3\Logger\Api\ILogger;
-use Base3\Worker\MasterWorker;
+use Base3\CoreFoundation\Api\IClassMap;
+use Base3\CoreFoundation\Api\IContainer;
+use Base3\CoreFoundation\Api\IDisplay;
+use Base3\CoreFoundation\Api\IAssetResolver;
+use Base3\CoreFoundation\Authorization\Api\IAuthorizationService;
+use Base3\CoreFoundation\Authorization\Dto\AuthorizationRequest;
+use Base3\CoreFoundation\Usermanager\Permission;
+use Base3\UiFoundation\Api\ISettingsTab;
+use Base3\CoreFoundation\Api\IOutput;
+use Base3\CoreFoundation\Hook\Api\IHookManager;
+use Base3\CoreFoundation\Logger\Api\ILogger;
+use Base3\Core\Worker\MasterWorker;
 use RuntimeException;
 
 /** One BASE3 container and lifecycle per Moodle request, shared by all entry points. */
@@ -146,9 +146,11 @@ final class Runtime {
 		global $CFG;
 		$root = dirname(__DIR__, 4);
 		$modules = $root . '/base3/modules/';
-		$framework = $modules . 'Base3Framework/';
-		if (!is_file($framework . 'base3.json') || !is_file($framework . 'src/Core/Autoloader.php')) {
-			throw new RuntimeException('BASE3 modules are missing below ' . $modules);
+		$core = $modules . 'Core/';
+		$coreFoundation = $modules . 'CoreFoundation/';
+		if (!is_file($core . 'base3.json') || !is_file($coreFoundation . 'base3.json')
+			|| !is_file($coreFoundation . 'src/Api/IModuleRegistry.php')) {
+			throw new RuntimeException('BASE3 Core or CoreFoundation modules are missing below ' . $modules);
 		}
 		$data = rtrim((string) $CFG->dataroot, '/\\') . '/base3/';
 		foreach ([$data, $data . 'cnf/', $data . 'cache/', $data . 'tmp/', $data . 'userfiles/'] as $directory) {
@@ -157,12 +159,12 @@ final class Runtime {
 			}
 		}
 		$constants = [
-			'DIR_ROOT' => $framework, 'DIR_FRAMEWORK' => $framework,
+			'DIR_ROOT' => $core, 'DIR_FRAMEWORK' => $core,
 			'DIR_PLUGIN' => $modules, 'DIR_BASE3' => $modules,
-			'DIR_SRC' => $framework . 'src/', 'DIR_TEST' => $framework . 'test/',
+			'DIR_SRC' => $core . 'src/', 'DIR_TEST' => $core . 'test/',
 			'DIR_CNF' => $data . 'cnf/', 'DIR_TMP' => $data . 'cache/',
 			'DIR_LOCAL' => $data, 'DIR_USERFILES' => $data . 'userfiles/',
-			'DIR_TPL' => $framework . 'tpl/'
+			'DIR_TPL' => $core . 'tpl/'
 		];
 		foreach ($constants as $key => $value) {
 			if (defined($key) && constant($key) !== $value) {
@@ -171,8 +173,7 @@ final class Runtime {
 			if (!defined($key)) define($key, $value);
 		}
 		if (getenv('DEBUG') === false) putenv('DEBUG=0');
-		require_once $framework . 'src/Core/Autoloader.php';
-		\Base3\Core\Autoloader::register();
+		require_once $coreFoundation . 'src/Api/IModuleRegistry.php';
 		require_once __DIR__ . '/ModuleCatalog.php';
 		self::$catalog = new ModuleCatalog($modules);
 		self::$catalog->all();

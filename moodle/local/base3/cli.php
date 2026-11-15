@@ -12,7 +12,7 @@ require_once __DIR__ . '/classes/Runtime.php';
 if ($unrecognized) cli_error('Unexpected arguments: ' . implode(', ', $unrecognized));
 \local_base3\Runtime::boot();
 if ($options['rebuild']) {
-	\local_base3\Runtime::container()->get(\Base3\Api\IClassMap::class)->generate(true);
+	\local_base3\Runtime::container()->get(\Base3\CoreFoundation\Api\IClassMap::class)->generate(true);
 	echo "BASE3 class map rebuilt.\n";
 } elseif ($options['worker']) {
 	\local_base3\Runtime::runWorker();

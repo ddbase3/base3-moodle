@@ -2,27 +2,27 @@
 
 namespace local_base3;
 
-use Base3\Api\IBootstrap;
-use Base3\Api\IClassMap;
-use Base3\Api\IComponentResolver;
-use Base3\Api\IContainer;
-use Base3\Api\IModuleRegistry;
-use Base3\Api\IPlugin;
-use Base3\Api\IRequest;
-use Base3\Api\ISystemService;
+use Base3\CoreFoundation\Api\IBootstrap;
+use Base3\CoreFoundation\Api\IClassMap;
+use Base3\CoreFoundation\Api\IComponentResolver;
+use Base3\CoreFoundation\Api\IContainer;
+use Base3\CoreFoundation\Api\IModuleRegistry;
+use Base3\CoreFoundation\Api\IPlugin;
+use Base3\CoreFoundation\Api\IRequest;
+use Base3\CoreFoundation\Api\ISystemService;
 use Base3\Core\ComponentResolver;
-use Base3Moodle\Adapter\MoodleRequest;
+use Base3\Base3Moodle\Adapter\MoodleRequest;
 use Base3\Core\ServiceLocator;
-use Base3\Hook\Api\IHookListener;
-use Base3\Hook\Api\IHookManager;
-use Base3\Hook\HookManager;
-use Base3\LinkTarget\Api\ILinkTargetService;
-use Base3\Migration\Api\IMigrationRunner;
-use Base3\Migration\No\NoMigrationRunner;
-use Base3\ServiceSelector\Api\IServiceSelector;
-use Base3\ServiceSelector\Standard\StandardServiceSelector;
-use Base3Moodle\Adapter\MoodleSystemService;
-use Base3Moodle\Adapter\MoodleLinkTargetService;
+use Base3\CoreFoundation\Hook\Api\IHookListener;
+use Base3\CoreFoundation\Hook\Api\IHookManager;
+use Base3\Core\Hook\HookManager;
+use Base3\CoreFoundation\LinkTarget\Api\ILinkTargetService;
+use Base3\CoreFoundation\Migration\Api\IMigrationRunner;
+use Base3\Core\Migration\No\NoMigrationRunner;
+use Base3\CoreFoundation\ServiceSelector\Api\IServiceSelector;
+use Base3\Core\ServiceSelector\Standard\StandardServiceSelector;
+use Base3\Base3Moodle\Adapter\MoodleSystemService;
+use Base3\Base3Moodle\Adapter\MoodleLinkTargetService;
 
 final class MoodleBootstrap implements IBootstrap {
 
@@ -64,7 +64,7 @@ final class MoodleBootstrap implements IBootstrap {
 		$project->init();
 
 		foreach ($classMap->getInstancesByInterface(IPlugin::class) as $plugin) {
-			if ($plugin instanceof \Base3Moodle\Base3MoodlePlugin || $plugin instanceof \Base3MoodleLab\Base3MoodleLabPlugin) continue;
+			if ($plugin instanceof \Base3\Base3Moodle\Base3MoodlePlugin || $plugin instanceof \Base3\Base3MoodleLab\Base3MoodleLabPlugin) continue;
 			if (!$plugin instanceof IPlugin) throw new \RuntimeException('BASE3 class map produced an invalid plugin instance.');
 			$plugin->init();
 		}

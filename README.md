@@ -40,15 +40,15 @@ system.
 
 ## Moodle generic settings and native file storage (November 2026)
 
-This release uses the shared `ClientStack\Display\SettingsDisplay` and
-`UiFoundation\Api\ISettingsTab` discovery. Moodle no longer owns an extra
+This release uses the shared `Base3\ClientStack\Display\SettingsDisplay` and
+`Base3\UiFoundation\Api\ISettingsTab` discovery. Moodle no longer owns an extra
 static administration tab list. The existing `moodle/local/base3` admin entry
 uses `settingsdisplay` and the same server-side Moodle capabilities and BASE3
 feature checks as direct AJAX requests. Project `Base3MoodleLab` supplies the
 single `chatbot/default` display data record; generic Chatbot, UiFoundation,
 ClientStack and other module settings tabs stay in their owning modules.
 
-`ClientStack\GlobalChatbotLauncher\GlobalChatbotLauncherFeature` now owns the
+`Base3\ClientStack\GlobalChatbotLauncher\GlobalChatbotLauncherFeature` now owns the
 launcher feature globally. The duplicate MoodleLab feature has been removed;
 no feature-audience migration is performed. A trusted developer must still
 have native Moodle site administration and BASE3 `development` membership.

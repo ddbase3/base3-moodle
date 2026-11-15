@@ -2,9 +2,9 @@
 
 namespace local_base3;
 
-use Base3\Api\IAssetResolver;
-use Base3\Api\IClassMap;
-use Base3\Api\IDisplay;
+use Base3\CoreFoundation\Api\IAssetResolver;
+use Base3\CoreFoundation\Api\IClassMap;
+use Base3\CoreFoundation\Api\IDisplay;
 use RuntimeException;
 
 final class AdminTools {

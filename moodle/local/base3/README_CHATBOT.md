@@ -8,7 +8,7 @@ JavaScript or CSS.
 
 ## Install or update
 
-1. Pull the current `Base3Framework`, `Base3Moodle`, `Base3MoodleLab`,
+1. Pull the current `Core`, `CoreFoundation`, `Base3Moodle`, `Base3MoodleLab`,
    `ClientStack` and `Chatbot` modules.
 2. Apply the feature patch under the existing `base3/` source directory.
 3. Execute `./install.sh` to synchronize `moodle/` to Moodle's `public/`

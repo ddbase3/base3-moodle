@@ -28,7 +28,8 @@ for component in local blocks filter; do
     fi
 done
 
-if [ ! -f "$BASE3_DIR/modules/Base3Framework/base3.json" ] || \
+if [ ! -f "$BASE3_DIR/modules/Core/base3.json" ] || \
+   [ ! -f "$BASE3_DIR/modules/CoreFoundation/base3.json" ] || \
    [ ! -f "$BASE3_DIR/modules/Base3Moodle/base3.json" ] || \
    [ ! -f "$BASE3_DIR/modules/Base3MoodleLab/base3.json" ] || \
    [ ! -f "$BASE3_DIR/modules/ClientStack/assets/assetloader/assetloader.min.js" ]; then

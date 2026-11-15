@@ -26,15 +26,15 @@ class context_system {
 
 class TestContainer {
 	public function get(string $id): object {
-		if ($id !== \Base3\Language\Api\ILanguage::class) {
+		if ($id !== \Base3\CoreFoundation\Language\Api\ILanguage::class) {
 			throw new RuntimeException('Unexpected service requested: ' . $id);
 		}
-		return new \Base3Moodle\Adapter\MoodleLanguage();
+		return new \Base3\Base3Moodle\Adapter\MoodleLanguage();
 	}
 }
 
 $root = dirname(__DIR__);
-require_once $root . '/modules/Base3Framework/src/Language/Api/ILanguage.php';
+require_once $root . '/modules/CoreFoundation/src/Language/Api/ILanguage.php';
 require_once $root . '/modules/Base3Moodle/src/Adapter/MoodleLanguage.php';
 
 $base = sys_get_temp_dir() . '/base3-moodle-chatbot-locale-' . bin2hex(random_bytes(8));

@@ -8,7 +8,7 @@ use RuntimeException;
 /** Builds the normal BASE3 class map from module manifest namespaces, not directory names. */
 final class MoodleClassMap extends PluginClassMap {
 
-	public function __construct(\Base3\Api\IContainer $container, private readonly ModuleCatalog $catalog) {
+	public function __construct(\Base3\CoreFoundation\Api\IContainer $container, private readonly ModuleCatalog $catalog) {
 		parent::__construct($container);
 	}
 

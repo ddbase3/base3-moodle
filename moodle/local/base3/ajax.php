@@ -34,9 +34,9 @@ try {
 	\local_base3\Runtime::boot();
 	if ($name === 'chatbotdisplay' && is_array($data)
 		&& is_string($data['config_group'] ?? null)
-		&& trim($data['config_group']) === \Base3MoodleLab\Service\MoodleChatbotConfiguration::GLOBAL_CHATBOT_GROUP
+		&& trim($data['config_group']) === \Base3\Base3MoodleLab\Service\MoodleChatbotConfiguration::GLOBAL_CHATBOT_GROUP
 		&& is_string($data['config_name'] ?? null)
-		&& trim($data['config_name']) === \Base3MoodleLab\Service\MoodleChatbotConfiguration::GLOBAL_CHATBOT_NAME) {
+		&& trim($data['config_name']) === \Base3\Base3MoodleLab\Service\MoodleChatbotConfiguration::GLOBAL_CHATBOT_NAME) {
 		require_once __DIR__ . '/classes/ChatbotBubble.php';
 		if (!\local_base3\ChatbotBubble::visible()) {
 			http_response_code(403);

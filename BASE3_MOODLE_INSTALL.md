@@ -42,7 +42,8 @@ Die beiden Varianten nicht unnoetig hintereinander ausfuehren.
 
 ```sh
 cd /srv/sites/base3.de/moodle.base3.de/html
-test -f base3/modules/Base3Framework/base3.json && echo 'Framework vorhanden'
+test -f base3/modules/Core/base3.json && echo 'Core vorhanden'
+test -f base3/modules/CoreFoundation/base3.json && echo 'CoreFoundation vorhanden'
 test -f base3/modules/Base3Moodle/base3.json && echo 'Hostmodul vorhanden'
 test -f base3/modules/Base3MoodleLab/base3.json && echo 'Lab vorhanden'
 test -f public/local/base3/version.php && echo 'Moodle-Plugin vorhanden'
@@ -87,7 +88,7 @@ cd /srv/docker/sites/base3.de/moodle.base3.de
 docker compose exec -T -u www-data apache php /var/www/moodle/public/local/base3/cli.php --status
 ```
 
-Erwartung: Die Modulnamen inklusive `Base3Framework`, `Base3Moodle`, `Base3MoodleLab`, `ClientStack`, `Chatbot` und `MissionBay` werden mit Versionen angezeigt. Beim ersten Aufruf initialisiert BASE3 seine Module und fuehrt aktive BASE3-Migrationen durch.
+Erwartung: Die Modulnamen inklusive `Core`, `CoreFoundation`, `Base3Moodle`, `Base3MoodleLab`, `ClientStack`, `Chatbot` und `MissionBay` werden mit Versionen angezeigt. Beim ersten Aufruf initialisiert BASE3 seine Module und fuehrt aktive BASE3-Migrationen durch.
 
 ClassMap explizit neu aufbauen, falls erforderlich:
 

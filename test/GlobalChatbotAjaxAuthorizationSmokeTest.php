@@ -8,14 +8,14 @@ $local = $temporary . '/moodle/local/base3';
 $code = <<<'CODE'
 <?php declare(strict_types=1);
 
-namespace Base3\Api {
+namespace Base3\CoreFoundation\Api {
 	interface IBase { public static function getName(): string; }
 }
-namespace Base3\Translation\Api {
+namespace Base3\CoreFoundation\Translation\Api {
 	interface ITranslation { public function translate(string $set, string $section, string $key, string $fallback = '', array $replacements = []): string; }
 }
-namespace Base3\Authorization\Api {
-	interface IFeature extends \Base3\Api\IBase {
+namespace Base3\CoreFoundation\Authorization\Api {
+	interface IFeature extends \Base3\CoreFoundation\Api\IBase {
 		public function getLabel(): string;
 		public function getDescription(): string;
 		public function getPermissions(): array;
@@ -23,26 +23,26 @@ namespace Base3\Authorization\Api {
 	}
 	interface IAuthorizationService {
 		public function getDefaultAuthority(): string;
-		public function decide(\Base3\Authorization\Dto\AuthorizationRequest $request): \Base3\Authorization\Dto\AuthorizationDecision;
+		public function decide(\Base3\CoreFoundation\Authorization\Dto\AuthorizationRequest $request): \Base3\CoreFoundation\Authorization\Dto\AuthorizationDecision;
 		public function decideMany(array $requests): array;
 	}
 }
-namespace Base3\Usermanager {
+namespace Base3\CoreFoundation\Usermanager {
 	final class Permission {
 		public function __construct(public string $scope, public string $permission) {}
 		public static function for(string $scope, string $permission): self { return new self($scope, $permission); }
 	}
 }
-namespace Base3\Authorization\Dto {
+namespace Base3\CoreFoundation\Authorization\Dto {
 	final class AuthorizationRequest {
-		public function __construct(public string $authority, public \Base3\Usermanager\Permission $permission) {}
+		public function __construct(public string $authority, public \Base3\CoreFoundation\Usermanager\Permission $permission) {}
 	}
 	final class AuthorizationDecision {
 		public function __construct(private bool $allowed) {}
 		public function isAllowed(): bool { return $this->allowed; }
 	}
 }
-namespace Base3MoodleLab\Service {
+namespace Base3\Base3MoodleLab\Service {
 	final class Base3MoodleLabSettings {
 		public const GLOBAL_CHATBOT_GROUP = 'chatbot';
 		public const GLOBAL_CHATBOT_NAME = 'default';
@@ -55,14 +55,14 @@ namespace {
 		file_put_contents((string)getenv('MOODLE_TEST_STATUS_FILE'), (string)http_response_code());
 	});
 	function require_sesskey(): void {}
-	$GLOBALS['authorization'] = new class implements \Base3\Authorization\Api\IAuthorizationService {
+	$GLOBALS['authorization'] = new class implements \Base3\CoreFoundation\Authorization\Api\IAuthorizationService {
 		public function getDefaultAuthority(): string { return 'moodle'; }
-		public function decide(\Base3\Authorization\Dto\AuthorizationRequest $request): \Base3\Authorization\Dto\AuthorizationDecision {
+		public function decide(\Base3\CoreFoundation\Authorization\Dto\AuthorizationRequest $request): \Base3\CoreFoundation\Authorization\Dto\AuthorizationDecision {
 			if ($request->authority !== 'moodle' || $request->permission->scope !== 'feature'
 				|| $request->permission->permission !== 'globalchatbotlauncherfeature') {
 				throw new \RuntimeException('Unexpected feature authorization request.');
 			}
-			return new \Base3\Authorization\Dto\AuthorizationDecision(getenv('MOODLE_TEST_ALLOWED') === '1');
+			return new \Base3\CoreFoundation\Authorization\Dto\AuthorizationDecision(getenv('MOODLE_TEST_ALLOWED') === '1');
 		}
 		public function decideMany(array $requests): array { return []; }
 	};
@@ -78,7 +78,7 @@ final class Runtime {
 	public static function container(): object {
 		return new class {
 			public function get(string $id): object {
-				if ($id !== \Base3\Authorization\Api\IAuthorizationService::class) throw new \RuntimeException('Unknown service.');
+				if ($id !== \Base3\CoreFoundation\Authorization\Api\IAuthorizationService::class) throw new \RuntimeException('Unknown service.');
 				return $GLOBALS['authorization'];
 			}
 		};

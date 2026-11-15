@@ -2,7 +2,7 @@
 
 namespace local_base3;
 
-use Base3\Api\IModuleRegistry;
+use Base3\CoreFoundation\Api\IModuleRegistry;
 use RuntimeException;
 
 /** Discovers installed BASE3 modules from the single Moodle module root. */
@@ -79,7 +79,7 @@ final class ModuleCatalog implements IModuleRegistry {
 				$namespaces[strtolower($namespace)] = $file;
 			}
 		}
-		if (!isset($modules['Base3Framework'])) throw new RuntimeException('BASE3 Framework module missing.');
+		if (!isset($modules['Core']) || !isset($modules['CoreFoundation'])) throw new RuntimeException('BASE3 Core or CoreFoundation module missing.');
 		ksort($modules, SORT_NATURAL | SORT_FLAG_CASE);
 		$this->assertDependencies($modules);
 		return $this->modules = $modules;

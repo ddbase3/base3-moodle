@@ -2,7 +2,7 @@
 
 // Standalone regression test: php test/MoodleAssetLoaderSmokeTest.php
 
-namespace Base3\Api {
+namespace Base3\CoreFoundation\Api {
 	interface IContainer { public function get(string $id): mixed; }
 	interface IClassMap { public function getInstanceByInterfaceName(string $interface, string $name): mixed; }
 	interface IDisplay {}
@@ -10,22 +10,22 @@ namespace Base3\Api {
 	interface IAssetResolver { public function resolve(string $path): string; }
 }
 
-namespace Base3\Hook\Api {
+namespace Base3\CoreFoundation\Hook\Api {
 	interface IHookManager { public function dispatch(string $name): void; }
 }
 
-namespace Base3Moodle\Api {
+namespace Base3\Base3Moodle\Api {
 	interface IBase3MoodleSettings { public function getAdministrationConfig(): array; }
 }
 
 namespace {
-	use Base3\Api\IAssetResolver;
-	use Base3\Api\IClassMap;
-	use Base3\Api\IContainer;
-	use Base3\Api\IDisplay;
-	use Base3\Api\IOutput;
-	use Base3\Hook\Api\IHookManager;
-	use Base3Moodle\Api\IBase3MoodleSettings;
+	use Base3\CoreFoundation\Api\IAssetResolver;
+	use Base3\CoreFoundation\Api\IClassMap;
+	use Base3\CoreFoundation\Api\IContainer;
+	use Base3\CoreFoundation\Api\IDisplay;
+	use Base3\CoreFoundation\Api\IOutput;
+	use Base3\CoreFoundation\Hook\Api\IHookManager;
+	use Base3\Base3Moodle\Api\IBase3MoodleSettings;
 	use local_base3\AdminTools;
 	use local_base3\Runtime;
 
